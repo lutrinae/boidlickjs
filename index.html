@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- A template for learning Proce55ing, cobbled together by Puneet Kishor -->
+<!-- Released under a Creative Commons 3.0 BY license -->
+<!-- Jan 2010 -->
+<!-- Contact punkish@eidesis.org with quesitons -->
+
+<!-- Note the html5 DOCTYPE declaration above. It is as simple as !DOCTYPE html -->
+
+<html>
+<head>
+    <title>Flocking.js</title> 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="http://www.processingjs.org/favicon.ico">
+    
+    <!-- Put all the stylesheets first -->
+    <link rel="stylesheet" media="screen" type ="text/css" href="SyntaxHighlighter.css">
+    
+    <!-- Bring in the JS libraries -->
+    <script type="text/javascript" src="jquery-1.4.min.js"></script>
+    <script type="text/javascript" src="shCore.js"></script>
+    <script type="text/javascript" src="shBrushProcessing.js"></script>
+    <script type="text/javascript" src="processing.js"></script>
+</head>
+<body >
+
+
+<div id="page">  
+    <div id="content">
+        <p id="desc"></p>
+<!-- CHANGE WIDTH AND HEIGHT -->
+        <canvas oncontextmenu="return false;" onmousedown="return false;" id="myCanvas" width="400" height="400"></canvas>
+        <p id="instructions"></p>
+    </div><!-- #content -->
+    
+    <div class="code"><pre name="code" class="processing"></pre></div>
+</div><!-- #page -->
+
+<script language="JavaScript" type="text/javascript">
+var PJS = {
+    "name" : "flocking",
+    
+    "desc" : "<b>Super Space Tempest: Revenge of the Boids</b><br>By: Brad Lang & Will McCardell",
+        
+    "instructions": "<br><!-- Instructions --> This is best described as a mixture of <b>Space Invaders</b> and <b>Tempest</b>. <br>Left click to shoot your weapon. Right click to remove all pulses, or detonate your missile. <br>Press 'q' to select pulse gun. You can only have about 15 shots on the screen at a time though! Press 'w' to select your missile. You only have 5 missiles though, so use them wisely! <br> When using the pulse gun, the boids will try to avoid the shots. <br> 'c' will add boids at the cursors position. <br> 'r' will toggle whether to show the attraction node's position or not. <br> Works best in chrome. <br> <br> Once you destroy all the boids, you'll win. And have to refresh to play again.<br> <br><b>Misc:</b> One thing we did to make it work faster was consolidate the Separation/Cohesion/Alignment code so we weren't doing the same work over and over again. This gave some large boosts in performance. We spent a few hours trying to decouple all the functions from Vector3D since adding all the methods per initialization is very expensive. This didn't want to work, so eventually we abandoned that endeavour.<br><br><b>Performance:</b> It works fairly well with 50 boids, even on an old machine from around 2003. The trick is you have to run it in Chrome, as firefox is too slow. At 150 Boids, the game is barely playable. <br><br><b>Bottlenecks: </b>One bottleneck is the number of ArrayLists we loop through per frame.Originally, another bottle neck was the number of Vector3Ds that were made. They took a lot of time to make, and they were made a lot. We moved most of the methods out of Vector3D, and now it runs much, much faster. <br><br><b>Behaviours: </b>We played around with attraction and aversion for a bit. Attraction is how they move around the screen: the boids follow an invisible moving point. Aversion is how they avoid the bullets. Right now, the multiplier for aversion is equal to the multipler for separation. One thing we ended up doing was make it so once there are 5 boids left, the aversion factor will be less, so it's easier to destroy them all. We also played around with the speeds of the boids. When they were super slow, the game was too easy. Now it's more challenging and you have to exploit the aversion code."
+};
+
+$(document).ready(function() {
+
+    // Fill in the blanks
+    $("#desc").html(PJS.desc);
+    $("#instructions").html(PJS.instructions);
+    
+    // Pass the script to a var using jQuery.ajax();
+    var script = $.ajax({url: PJS.name + ".js", async: false}).responseText;
+    
+    // Store the Canvas element in an object alias
+    var canvas = $('canvas#myCanvas').get(0);
+    
+    // Initialize Processing
+    Processing(canvas, script);
+    
+    // Put the script into the < pre > tag
+    $('pre.processing').html(script);
+    
+    // Highlight the code inside the < pre > tag
+    dp.SyntaxHighlighter.HighlightAll('code');  
+});
+</script>
+
+</body>  
+</html>
