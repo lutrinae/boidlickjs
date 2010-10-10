@@ -14,29 +14,34 @@ boolean drawPulse;
 boolean drawMissile;
 int placeType;
 int shipYval;
-int wid;
-int halfwidth;
-int halfheight;
-boolean begin;
 Player ship;
+
+boolean begin;
+float beta;
 
 int PULSE = 1;
 int MISSILE = 2;
 
 boolean drawAttraction;
 
+int halfwidth;
+int halfheight;
+int backR;
+int backG;
+int backB;
+
 void setup() {
     size(1000,600); //width, height
-    wid = width/2;
-	halfwidth = wid;
-	halfheight = height/2;
     colorMode(RGB,255,255,255,100);
     
     initCode();
 }
 
-void initCode()
-{
+void initCode() {
+
+	halfwidth = width/2;
+	halfheight = height/2;
+
     flock = new Flock();
 
     // Add an initial set of boids into the system
@@ -55,20 +60,23 @@ void initCode()
     attractionNodes = new ArrayList();
     bullets = new ArrayList();
     explosions = new ArrayList();
-    background(0);
+    backR = 0;
+    backG = 0;
+    backB = 51;
+    background(backR, backG, backB);
     smooth();
     
     sYval = height/(20/19);
     
-    targetYvalStart = height/6;
-    targetXval = width/4;
-    targetYval = targetYvalStart;
+    targetXval = halfwidth;
+    targetYval = halfheight;
     targetSpeed = 5;
     moveTargetRight = 1;
     begin = true;//must be true for attraction point to be created
 
     ship = new Player(3);
 
+	beta = 0;
     drawAttraction = true;//TODO turn off
 
 }
@@ -89,7 +97,7 @@ void draw()
 //{{{ realDraw
 void realDraw()
 {
-    background(0);
+    background(backR, backG, backB);
     
     if(ship.isDead()) {
         fill(128);
@@ -104,55 +112,30 @@ void realDraw()
         begin = 0;
     }
     
-    //background(0);
-    if(goToTarget == true) //asdf
-    {
+    if(goToTarget == true) { //asdf
+	
         Vector3D tmpX;
         Vector3D tmpY;
 		
 //		x = a*sec(ß) cos(tan(ß) - ß) + halfwidth
 //		y = a*sec(ß) sin(tan(ß) - ß) + halfheight
-		
-		
-		
-		
-        for(int i = 0; i < attractionNodes.size(); i++)
-        {
-		
-		targetXval = halfwidth;
-		//targetXval = sec(beta) cos(tan(beta) - beta) + halfwidth;
-		((Vector3D)attractionNodes.get(i)).x = targetXval;
-		targetYval = halfheight;
-		//targetYval = sec(beta) sin(tan(beta) - beta) + halfheight;
-		((Vector3D)attractionNodes.get(i)).y = targetYval;
-		
-		/*
-            if(moveTargetRight) {
-                targetXval += targetSpeed;
-                ((Vector3D)attractionNodes.get(i)).x = targetXval;
-            }else {
-                targetXval -= targetSpeed;
-                ((Vector3D)attractionNodes.get(i)).x = targetXval;
-            }
-            
-            if (targetXval > width-50) {
-                moveTargetRight = 0;
-                targetYval += 50;
-                ((Vector3D)attractionNodes.get(i)).y = targetYval;
-            }
-            if (targetXval < 50){
-                moveTargetRight = 1;
-                targetYval += 50;
-                ((Vector3D)attractionNodes.get(i)).y = targetYval;
-            }
-            if (targetYval > halfheight)
-            {
-                targetYval = targetYvalStart; 
-                ((Vector3D)attractionNodes.get(i)).y = targetYval;
-            }*/
 
-            if(drawAttraction)
-            {
+
+		
+        for(int i = 0; i < attractionNodes.size(); i++) {
+		
+			renderHome();
+				
+		
+			targetXval = halfwidth;
+			//targetXval = sec(beta) cos(tan(beta) - beta) + halfwidth;
+			((Vector3D)attractionNodes.get(i)).x = targetXval;
+			targetYval = halfheight;
+			//targetYval = sec(beta) sin(tan(beta) - beta) + halfheight;
+			((Vector3D)attractionNodes.get(i)).y = targetYval;
+
+            if(drawAttraction) {
+			
                 fill(255,0,0);
                 rect(targetXval, targetYval, 10, 10);
             }
@@ -209,6 +192,16 @@ void realDraw()
         }
     }
     
+
+}
+
+void renderHome() {
+
+	/* @pjs preload="media/LilypadSm.png"; */
+	PImage lil;
+	lil = loadImage("media/LilypadSm.png");
+    image(lil, halfwidth-90, halfheight-75);
+
 
 }
 //}}}
@@ -551,24 +544,25 @@ class Boid {
         return steer;
     }
 
+	//render boids - Draw a triangle rotated in the direction of velocity
     void render() {
-        // Draw a triangle rotated in the direction of velocity
-        
+		
+		
         float theta = heading2D(vel) + radians(90);
-        fill(0,0,255);
-        stroke(0,128,255);
+        fill(100); // 0,0,255
+        stroke(240); //0,128,255
         pushMatrix();
-        translate(loc.x,loc.y);
-        rotate(theta);
-        beginShape(TRIANGLES);
+			translate(loc.x,loc.y);
+			rotate(theta);
+			beginShape(TRIANGLES);
 
-            vertex(0, -r*2);
+				vertex(0, -r*2);
 
-            vertex(-r, r*2);
+				vertex(-r, r*2);
 
-            vertex(r, r*2);
+				vertex(r, r*2);
 
-        endShape();
+			endShape();
         popMatrix();
     }
 
@@ -789,7 +783,7 @@ static class Player
     void update()
     {
         //shipwidth here should probably be shipHeight...
-        shipYval = (((mouseX-wid)*(mouseX-wid))*-.001) + height - 2*shipWidth;
+        shipYval = (((mouseX-halfwidth)*(mouseX-halfwidth))*-.001) + height - 2*shipWidth;
         setXY(loc,mouseX, shipYval);
         theta = atan2( (shipYval - halfheight), (loc.x - halfwidth));
         theta = theta + radians(-90);
