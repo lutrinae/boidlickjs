@@ -2,6 +2,9 @@
 // Polar:		r=a*sec(ß)	    θ = tan(ß) - ß 
 // Cartesian:	x = r cos(θ)	=>	x = a*sec(ß) cos(tan(ß) - ß)
 //				y = r sin(θ)	=>	y = a*sec(ß) sin(tan(ß) - ß)
+// Polar:		r= a + b(theta)
+// Cartesian:	x = a + b(theta) * cos(theta) 
+//				y = a + b(theta) * sin(theta) 
 
 Flock flock;
 ArrayList attractionNodes;
@@ -17,10 +20,11 @@ int shipYval;
 Player ship;
 
 boolean begin;
-float beta;
+float flockAngle;
 
 int PULSE = 1;
 int MISSILE = 2;
+int keyval;
 
 boolean drawAttraction;
 
@@ -29,9 +33,10 @@ int halfheight;
 int backR;
 int backG;
 int backB;
+PFont font;
 
 void setup() {
-    size(1000,600); //width, height
+    size(700,700); //width, height
     colorMode(RGB,255,255,255,100);
     
     initCode();
@@ -41,6 +46,7 @@ void initCode() {
 
 	halfwidth = width/2;
 	halfheight = height/2;
+	font = loadFont("media/Arial");
 
     flock = new Flock();
 
@@ -76,7 +82,7 @@ void initCode() {
 
     ship = new Player(3);
 
-	beta = 0;
+	flockAngle = 12*PI;
     drawAttraction = true;//TODO turn off
 
 }
@@ -84,8 +90,9 @@ void initCode() {
 int lastRedraw = 0;
 int CLOCKS_PER_SECOND = 1000;
 
-void draw() 
-{
+void draw() {
+ 
+	fill(keyval);
     if(millis() - lastRedraw > CLOCKS_PER_SECOND / 30)
     {
         lastRedraw = millis();
@@ -95,8 +102,8 @@ void draw()
 }
 
 //{{{ realDraw
-void realDraw()
-{
+void realDraw() {
+	
     background(backR, backG, backB);
     
     if(ship.isDead()) {
@@ -119,6 +126,9 @@ void realDraw()
 		
 //		x = a*sec(ß) cos(tan(ß) - ß) + halfwidth
 //		y = a*sec(ß) sin(tan(ß) - ß) + halfheight
+// Polar:		r= a + b(theta)
+// Cartesian:	x = a + b(theta) * cos(theta) 
+//				y = a + b(theta) * sin(theta) 
 
 
 		
@@ -126,13 +136,15 @@ void realDraw()
 		
 			renderHome();
 				
-		
-			targetXval = halfwidth;
-			//targetXval = sec(beta) cos(tan(beta) - beta) + halfwidth;
+			//flock path
+			targetXval = 9 * flockAngle * cos(flockAngle) + halfwidth;
 			((Vector3D)attractionNodes.get(i)).x = targetXval;
-			targetYval = halfheight;
-			//targetYval = sec(beta) sin(tan(beta) - beta) + halfheight;
+			targetYval = 9 * flockAngle * sin(flockAngle) + halfheight;
 			((Vector3D)attractionNodes.get(i)).y = targetYval;
+			
+			flockAngle -= QUARTER_PI/32;
+			//displayText("" + flockAngle);
+			
 
             if(drawAttraction) {
 			
@@ -194,6 +206,7 @@ void realDraw()
     
 
 }
+//}}}
 
 void renderHome() {
 
@@ -204,7 +217,13 @@ void renderHome() {
 
 
 }
-//}}}
+
+void displayText(String s) {
+
+	textFont(font); 
+	text(s, halfwidth, halfheight, 70, 70);
+
+}
 
 //{{{ status bar
 void statusBar()
@@ -372,7 +391,7 @@ void mousePressed() {
 
 void keyPressed()
 {
-    switch(key)
+    switch(keyval)
     {
         case 'q':
             placeType = PULSE;
