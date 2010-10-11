@@ -46,12 +46,12 @@ void initCode() {
 
 	halfwidth = width/2;
 	halfheight = height/2;
-	font = loadFont("media/Arial");
+	font = loadFont("media/PT Sans.ttf");
 
     flock = new Flock();
 
     // Add an initial set of boids into the system
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 75; i++) {
         //Vector3D v = new Vector3D(halfwidth,halfheight);
         Vector3D v = new Vector3D(halfwidth,90,0);
         Boid b = new Boid(v, 5, 0.2 );
@@ -82,7 +82,7 @@ void initCode() {
 
     ship = new Player(3);
 
-	flockAngle = 12*PI;
+	flockAngle = 11.5*PI;
     drawAttraction = true;//TODO turn off
 
 }
@@ -143,7 +143,7 @@ void realDraw() {
 			((Vector3D)attractionNodes.get(i)).y = targetYval;
 			
 			flockAngle -= QUARTER_PI/32;
-			//displayText("" + flockAngle);
+			displayText("" + flockAngle);
 			
 
             if(drawAttraction) {
